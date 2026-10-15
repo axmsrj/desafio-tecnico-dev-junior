@@ -143,6 +143,29 @@ public class BuscaProfessorServiceTests
         Assert.Equal("Sem horário em comum nos dias pedidos", naoElegivel.Motivo);
     }
 
+    [Fact]
+    public async Task BuscarProfessoresAsync_NaoDeveAtravessarMeiaNoite()
+    {
+        var professor = CriarProfessor(
+            id: 1,
+            nome: "Ana",
+            disponibilidades:
+            [
+                NovaDisponibilidade("segunda", "00:00", "01:00")
+            ]);
+        var service = CriarService(professor);
+        var request = CriarRequest(
+            inicio: "23:45",
+            fim: "23:59",
+            duracao: 30);
+
+        var resposta = await service.BuscarProfessoresAsync(request);
+
+        Assert.Empty(resposta.Professores);
+        var naoElegivel = Assert.Single(resposta.NaoElegiveis);
+        Assert.Equal("Sem horário em comum nos dias pedidos", naoElegivel.Motivo);
+    }
+
     private static BuscaProfessorService CriarService(params Professor[] professores)
     {
         return new BuscaProfessorService(new ProfessorRepositoryFake(professores));

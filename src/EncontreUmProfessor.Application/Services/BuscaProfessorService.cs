@@ -36,7 +36,7 @@ public class BuscaProfessorService : IBuscaProfessorService
                 continue;
             }
 
-            var horarios = FindHorariosEmComum(prof, inicio, fim, request.Dias, request.DuracaoMinutos);
+            var horarios = FindHorariosEmComum(prof, inicio, fim, request.Dias!, request.DuracaoMinutos);
 
             if (horarios.Count == 0)
             {
@@ -85,6 +85,11 @@ public class BuscaProfessorService : IBuscaProfessorService
         else if (inicio.Minute > 30)
         {
             horarioEmPrimeiro = new TimeOnly(inicio.Hour, 0).AddHours(1);
+        }
+        
+        if (horarioEmPrimeiro < inicio)
+        {
+            return horarios;
         }
 
         for (var inicioDaAula = horarioEmPrimeiro;
